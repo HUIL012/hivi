@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  name               String
+  passwordHash       String
+  role               Role                @default(CUSTOMER)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  orders             Order[]
+  previewPermissions PreviewPermission[]
+}
+
+model Module {
+  id             String             @id @default(cuid())
+  slug           String             @unique
+  nameZh         String
+  nameEn         String
+  summaryZh      String
+  summaryEn      String
+  priceCents     Int
+  active         Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  narratives     ModuleNarrative[]
+  orderItems     OrderItem[]
+  previewEntries PreviewPermission[]
+}
+
+model ModuleNarrative {
+  id         String   @id @default(cuid())
+  moduleId   String
+  locale     String
+  coreUse    String
+  useCase    String
+  background String
+  painPoint  String
+  overview   String
+  highlights String
+  userHelp   String
+  principle  String
+  updatedAt  DateTime @updatedAt
+  module     Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([locale, moduleId])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNo     String      @unique
+  userId      String
+  status      String
+  totalCents  Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  orderId    String
+  moduleId   String
+  quantity   Int    @default(1)
+  priceCents Int
+  order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  module     Module @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+
+  @@unique([orderId, moduleId])
+}
+
+model ContentSection {
+  id        String   @id @default(cuid())
+  locale    String
+  key       String
+  title     String
+  body      String
+  updatedAt DateTime @updatedAt
+
+  @@unique([locale, key])
+}
+
+model PreviewPermission {
+  id        String   @id @default(cuid())
+  userId    String
+  moduleId  String
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
