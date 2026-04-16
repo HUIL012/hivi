@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const AppContext = createContext(null);
+const STORAGE_KEY = "tidytree-site-state-v1";
 
 const defaultModules = [
   {
@@ -148,6 +149,7 @@ const dictionary = {
       total: "总计",
       loginHint: "你尚未登录，点击按钮跳转登录后购买。",
       loginRequired: "请先登录后购买模块。",
+      loginToSelect: "点击模块前请先登录。",
       formIncomplete: "请至少选择一个模块并填写企业名称。",
       orderPlaced: "订单已创建，销售顾问将尽快联系你。",
       company: "企业名称",
@@ -275,6 +277,7 @@ const dictionary = {
       total: "Total",
       loginHint: "You are not logged in. Please sign in before purchasing.",
       loginRequired: "Please login before purchasing modules.",
+      loginToSelect: "Please login before selecting modules.",
       formIncomplete: "Please select at least one module and enter company name.",
       orderPlaced: "Order created. Our consultant will contact you shortly.",
       company: "Company Name",
@@ -323,6 +326,34 @@ export function AppProvider({ children }) {
   const [users, setUsers] = useState(defaultUsers);
   const [orders, setOrders] = useState(defaultOrders);
   const [content, setContent] = useState(defaultContent);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        setHydrated(true);
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (parsed.language) setLanguage(parsed.language);
+      if (typeof parsed.isLoggedIn === "boolean") setIsLoggedIn(parsed.isLoggedIn);
+      if (Array.isArray(parsed.modules)) setModules(parsed.modules);
+      if (Array.isArray(parsed.users)) setUsers(parsed.users);
+      if (Array.isArray(parsed.orders)) setOrders(parsed.orders);
+      if (parsed.content?.zh && parsed.content?.en) setContent(parsed.content);
+    } catch (_error) {
+      // Keep defaults when storage data is invalid.
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const payload = { language, isLoggedIn, modules, users, orders, content };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  }, [hydrated, language, isLoggedIn, modules, users, orders, content]);
 
   const addOrder = (orderInput) => {
     const nextId = `o${new Date().toISOString().slice(0, 10).replaceAll("-", "")}${String(

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAppContext } from "../components/app-context";
 import { productCatalog, solutionBundles } from "../components/site-data";
 
@@ -13,6 +13,7 @@ export default function HomePage() {
   const { language, dictionary, content } = useAppContext();
   const [progress, setProgress] = useState(0);
   const [quizState, setQuizState] = useState({ size: "50-200", pain: "org" });
+  const demoTimers = useRef([]);
 
   const heroData = content[language];
   const displayProducts = productCatalog.slice(0, 9);
@@ -38,10 +39,12 @@ export default function HomePage() {
   }, [quizState, language]);
 
   const handleDemo = () => {
+    demoTimers.current.forEach((timer) => clearTimeout(timer));
+    demoTimers.current = [];
     setProgress(20);
-    setTimeout(() => setProgress(55), 350);
-    setTimeout(() => setProgress(85), 800);
-    setTimeout(() => setProgress(100), 1200);
+    demoTimers.current.push(setTimeout(() => setProgress(55), 350));
+    demoTimers.current.push(setTimeout(() => setProgress(85), 800));
+    demoTimers.current.push(setTimeout(() => setProgress(100), 1200));
   };
 
   return (

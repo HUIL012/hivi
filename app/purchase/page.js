@@ -39,6 +39,8 @@ export default function PurchasePage() {
         status: "Pending",
       });
     });
+    setModules((previous) => previous.map((module) => ({ ...module, selected: false })));
+    setCompany("");
     setNotice(dictionary.purchase.orderPlaced);
   };
 
