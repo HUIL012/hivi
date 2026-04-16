@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getDictionary, isLocale, type AppLocale } from "@/lib/i18n";
-import { formatCurrency, getContentSections, getModules } from "@/lib/data";
+import { getContentSections, getModules } from "@/lib/data";
 
 type LocalePageProps = {
   params: Promise<{ locale: string }>;
@@ -17,49 +17,55 @@ export default async function LocaleHomePage({ params }: LocalePageProps) {
 
   const sectionMap = new Map(sections.map((item) => [item.key, item]));
   const featuredModules = modules.slice(0, 3);
-  const heroPrimaryTitle =
-    locale === "zh" ? "构建你的" : "Build Your";
-  const heroAccentTitle =
-    locale === "zh" ? "AI 驱动型企业" : "AI-Driven Enterprise";
-  const heroPrimaryCta = locale === "zh" ? "立即预约演示" : "Book a Demo";
-  const heroSecondaryCta =
-    locale === "zh" ? "查看技术原理" : "View Technical Principles";
+  const heroPrimaryTitle = locale === "zh" ? "构建你的" : "Build your";
+  const heroAccentTitle = locale === "zh" ? "AI 驱动型企业" : "AI-driven enterprise";
+  const heroPrimaryCta = locale === "zh" ? "立即预约演示" : "Book a demo";
+  const heroSecondaryCta = locale === "zh" ? "查看技术原理" : "View technical principles";
+  const productMatrixTitle = locale === "zh" ? "AI 智能产品矩阵" : "AI Product Matrix";
   const learnMoreText = locale === "zh" ? "了解详情 →" : "Learn more →";
+  const iconPalette = [
+    { emoji: "🤖", className: "is-cyan" },
+    { emoji: "⚡", className: "is-blue" },
+    { emoji: "📈", className: "is-purple" }
+  ];
 
   return (
-    <>
-      <section className="home-dark-shell">
-        <div className="home-dark-hero card">
-          <h1 className="home-dark-title">
+    <div className="home-dark-page">
+      <header className="hero">
+        <div className="hero-glow" />
+        <div className="hero-panel">
+          <h1>
             {heroPrimaryTitle}
             <br />
-            <span>{heroAccentTitle}</span>
+            <span className="hero-highlight">{heroAccentTitle}</span>
           </h1>
-          <p className="home-dark-subtitle">{sectionMap.get("hero")?.body ?? dict.heroSubtitle}</p>
+          <p>{sectionMap.get("hero")?.body ?? dict.heroSubtitle}</p>
           <div className="hero-actions">
-            <Link className="btn btn-light" href={`/${locale}/preview`}>
+            <Link className="btn btn-hero-primary" href={`/${locale}/preview`}>
               {heroPrimaryCta}
             </Link>
-            <Link className="btn btn-dark-outline" href={`/${locale}/principles`}>
+            <Link className="btn btn-hero-secondary" href={`/${locale}/principles`}>
               {heroSecondaryCta}
             </Link>
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="section home-dark-shell" id="products">
-        <h2 className="section-title home-dark-heading">{locale === "zh" ? "AI 智能产品矩阵" : "AI Product Matrix"}</h2>
+      <section className="section" id="products">
+        <h2 className="section-title home-section-title">{productMatrixTitle}</h2>
         <div className="grid grid-3">
-          {featuredModules.map((module) => (
-            <article key={module.id} className="home-dark-card">
-              <div className="home-dark-card-icon">{module.name.charAt(4) || "AI"}</div>
+          {featuredModules.map((module, index) => {
+            const icon = iconPalette[index % iconPalette.length];
+            return (
+            <article key={module.id} className={`product-card ${icon.className}`}>
+              <div className={`product-card-icon ${icon.className}`}>{icon.emoji}</div>
               <h3>{module.name}</h3>
               <p>{module.summary}</p>
-              <Link href={`/${locale}/modules`} className="home-dark-link">
+              <Link href={`/${locale}/modules`} className={`product-card-link ${icon.className}`}>
                 {learnMoreText}
               </Link>
             </article>
-          ))}
+          );})}
         </div>
       </section>
 
@@ -68,25 +74,6 @@ export default async function LocaleHomePage({ params }: LocalePageProps) {
         <div className="card">
           <h3>{sectionMap.get("solutions")?.title ?? dict.solutionsTitle}</h3>
           <p className="muted">{sectionMap.get("solutions")?.body}</p>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2 className="section-title">{dict.pricingTitle}</h2>
-        <p className="muted">{dict.pricingSubtitle}</p>
-        <div className="grid grid-3">
-          {modules.map((module) => (
-            <article key={`price-${module.id}`} className="card">
-              <h3 style={{ marginTop: 0 }}>{module.name}</h3>
-              <p className="muted">{module.summary}</p>
-              <p style={{ fontSize: 24, fontWeight: 700 }}>
-                {formatCurrency(module.priceCents, locale)}
-              </p>
-              <Link className="btn btn-primary" href={`/${locale}/login`}>
-                {dict.buyModule}
-              </Link>
-            </article>
-          ))}
         </div>
       </section>
 
@@ -99,6 +86,7 @@ export default async function LocaleHomePage({ params }: LocalePageProps) {
           <p className="muted">{sectionMap.get("core-commonality")?.body}</p>
         </div>
       </section>
-    </>
+      <footer className="home-footer">© 2026 TidyTree.ai All rights reserved.</footer>
+    </div>
   );
 }
