@@ -9,7 +9,7 @@ function parseNumber(value) {
 }
 
 export default function AdminPage() {
-  const { language, dictionary, isLoggedIn, users, setUsers, orders, content, setContent } =
+  const { language, dictionary, isLoggedIn, users, setUsers, orders, setOrders, content, setContent } =
     useAppContext();
   const [tab, setTab] = useState("content");
   const [userForm, setUserForm] = useState({ name: "", email: "", role: "Viewer", status: "pending" });
