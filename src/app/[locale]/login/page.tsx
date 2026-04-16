@@ -12,12 +12,15 @@ export default async function LoginPage({ params }: LoginPageProps) {
   const dict = getDictionary(validLocale);
 
   return (
-    <div className="container" style={{ padding: "28px 0 60px" }}>
-      <div className="card" style={{ maxWidth: 520, margin: "0 auto" }}>
-        <h1 style={{ marginTop: 0 }}>{dict.loginTitle}</h1>
-        <p className="muted">{dict.loginHint}</p>
+    <section className="login-shell">
+      <div className="login-glow" />
+      <div className="login-card">
+        <div className="login-card-head">
+          <h1>{dict.loginTitle}</h1>
+          <p>{dict.loginHint}</p>
+        </div>
         <LoginForm locale={validLocale} dict={dict} />
       </div>
-    </div>
+    </section>
   );
 }

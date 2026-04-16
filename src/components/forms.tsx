@@ -44,7 +44,7 @@ export function LoginForm({ locale, dict }: LoginFormProps) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="form-grid">
+    <form onSubmit={onSubmit} className="form-grid login-form-grid">
       <div>
         <label htmlFor="email">{dict.email}</label>
         <input id="email" type="email" name="email" required />
@@ -54,7 +54,7 @@ export function LoginForm({ locale, dict }: LoginFormProps) {
         <input id="password" type="password" name="password" required />
       </div>
       {error ? <p className="danger">{error}</p> : null}
-      <button className="btn btn-primary" type="submit" disabled={pending}>
+      <button className="btn btn-light login-submit-btn" type="submit" disabled={pending}>
         {pending ? (locale === "zh" ? "登录中..." : "Signing in...") : dict.signIn}
       </button>
     </form>
